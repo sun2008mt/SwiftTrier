@@ -19,6 +19,7 @@ var str = "Hello, playground"
 //创建一个空数组
 var someInts = [Int]()
 print("someInts is of type [Int] with \(someInts.count) items")
+var someInts2 = Array<Int>()
 
 someInts.append(3)
 someInts = []        //空数组，但仍然是[Int]类型的
@@ -107,6 +108,197 @@ for (index, value) in shoppingList.enumerated() {
 // a == a(自反性)
 // a == b 意味着b == a（对称性）
 // a == b && b == c意味着a == c(传递性)
+
+//集合类型语法
+var letters = Set<Character>()
+print("letters is of type Set<Character> with \(letters.count) items")
+
+letters.insert("a")
+letters = []
+
+//用数组字面量创建集合
+var favoriteGenres: Set<String> = ["Rock", "Classical", "Hip hop"]
+print(favoriteGenres)
+
+var favoriteGeres2: Set = ["Rock"]
+
+//访问和修改一个集合
+print("I have \(favoriteGenres.count) favorite music genres")
+
+if favoriteGenres.isEmpty {
+    print("As far as music goes, I'm not picky")
+} else {
+    print("I have particular music preferences")
+}
+
+//insert，插入新元素
+favoriteGenres.insert("Jazz")
+
+//remove和removeAll
+if let removeGenre = favoriteGenres.remove("Rock") {
+    print("\(removeGenre)? I'm over it")
+} else {
+    print("I never much cared for that")
+}
+
+//contains，是否包含某元素
+if favoriteGenres.contains("Funk") {
+    print("I get up on the good foot")
+} else {
+    print("It's too funky in here")
+}
+
+//遍历集合
+for genre in favoriteGenres {
+    print("\(genre)")
+}
+
+//sorted,排序元素
+for genre in favoriteGenres.sorted() {
+    print("\(genre)")
+}
+
+//基本集合操作
+let oddDigits: Set = [1,3,5,7,9]
+let evenDigits: Set = [0,2,4,6,8]
+let singleDigitPrimeNumbers: Set = [2,3,5,7]
+
+//intersection，交集
+var intersection = oddDigits.intersection(singleDigitPrimeNumbers).sorted()   //返回的是数组对象
+print(intersection)
+print(type(of: intersection))
+
+//symmetricDifference，交集的补集
+var symmetricDifference = oddDigits.symmetricDifference(singleDigitPrimeNumbers).sorted()
+print(symmetricDifference)
+print(type(of: symmetricDifference))
+
+//union,并集
+var union = oddDigits.union(evenDigits).sorted()
+print(union)
+print(type(of: union))
+
+//subtracting,差集
+var subtracting = oddDigits.subtracting(singleDigitPrimeNumbers).sorted()
+print(subtracting)
+print(type(of: subtracting))
+
+//使用==来判断两个集合是否包含全部相同的值
+//使用isSubset来判断一个集合中的值是否也被包含在另外一个集合中
+//使用isSuperset来判断一个集合是否包含另一个集合中所有的值
+//使用isStrictSubset或isStrictSuperset判断一个集合是否是另一个集合的子集或父集并且两个集合并不相等
+//使用isDisjoint来判断两个集合是否不含有相同的值(完全不相交)
+
+let houseAnimals: Set = ["aa", "bb"]
+let farmAnimals: Set = ["aa", "bb", "cc", "dd", "ee"]
+let cityAnimals: Set = ["cc", "dd"]
+
+houseAnimals.isSubset(of: farmAnimals)
+farmAnimals.isSuperset(of: houseAnimals)
+houseAnimals.isDisjoint(with: cityAnimals)
+farmAnimals.isStrictSuperset(of: houseAnimals)
+
+//字典:每个值都关联唯一的键
+//Swift中的Dictionary类型被桥接到Foundation的NSDictionary类
+//一个字典的Key类型必须遵循Hashable协议，和Set的值类型一样
+
+//创建一个空字典
+var namesOfIntegers = [Int: String]()
+
+namesOfIntegers[16] = "sisteen"
+namesOfIntegers = [:]
+
+//用字典字面量创建字典
+var airports: [String: String] = ["YYZ": "Toronto Pearson", "DUB": "Dublin"]
+
+//访问和修改字典
+print("The dictionary of airports contains \(airports.count) items")
+
+if airports.isEmpty {
+    print("The airports dictionary is empty")
+} else {
+    print("The airports dictionary is not empty")
+}
+
+airports["LHR"] = "London"
+
+airports["LHR"] = "London Heathrow"
+
+//updateValue会返回旧值
+if let oldValue = airports.updateValue("Dublin Airport", forKey: "DUB") {
+    print("The old value for DUB was \(oldValue)")
+}
+
+//下标访问
+if let airportName = airports["DUB"] {
+    print("The name of the airport is \(airportName)")
+} else {
+    print("That airport is not in the airports dictionary")
+}
+
+airports["APL"] = "Apple Internation"
+airports["APL"] = nil        //赋值nil表明删除
+
+//removeValue会返回被移除的值或nil
+if let removedValue = airports.removeValue(forKey: "DUB") {
+    print("The removed airport's name is \(removedValue)")
+} else {
+    print("The airports dictionary does not contain a value for DUB")
+}
+
+//字典遍历
+for (airportCode, airportName) in airports {
+    print("\(airportCode): \(airportName)")
+}
+
+//sorted
+for airportCode in airports.keys.sorted() {
+    print("Airport code: \(airportCode)")
+}
+
+for airportName in airports.values.sorted() {
+    print("Airport name: \(airportName)")
+}
+
+print(type(of: airports.keys))      //Keys类型
+
+//将Keys类型转化为数组类型
+let airportCodes = [String](airports.keys)
+print(airportCodes)
+
+let airportNames = [String](airports.values)
+print(airportNames)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
