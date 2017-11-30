@@ -72,20 +72,98 @@ anotherNames = names.sorted(by: >)
 print("使用运算符方法，String类型的>实现：", anotherNames)
 
 //尾随闭包
+func someFunctionThatTakesAClosure(closure: () -> Void) {
+    closure()
+    print("函数体部分...")
+}
 
+//不使用尾随闭包进行函数调用
+someFunctionThatTakesAClosure(closure: {
+    print("不使用尾随闭包的闭包主体部分...")
+})
 
+//使用尾随闭包进行调用
+someFunctionThatTakesAClosure {
+    print("使用尾随闭包的闭包主体部分...")
+}
 
+//如果需要将一个很长的闭包表达式作为最后一个参数传递给函数，可以使用尾随闭包来增强函数的可读性，尾随闭包是一个书写在函数括号之后的闭包表达式，函数支持将其作为最后一个参数调用
+anotherNames = names.sorted() { $0 > $1 }
+print("尾随闭包版本：", anotherNames)
 
+//如果闭包表达式是函数或方法的唯一参数，则当你使用尾随闭包时，你甚至可以把()省略掉
+anotherNames = names.sorted { $0 > $1 }
+print("尾随闭包并且闭包表达式是唯一参数，可以去掉()：", anotherNames)
 
+//当闭包非常长以至于不能在一行中进行书写时，尾随闭包会非常有用
+//Swift的Array类型有一个map(_:)方法，获取一个闭包表达式作为其唯一参数；该闭包函数会为数组中的每一个元素所调用一次，并返回该元素所映射的值，最后将返回一个新数组，数组中包含了与原数组中的元素一一对应的映射后的值
+let digitNames = [
+    0: "Zero", 1: "One", 2: "Two", 3: "Three", 4: "Four",
+    5: "Five", 6: "Six", 7: "Seven", 8: "Eight", 9: "Nine"
+]
+let numbers = [16, 58, 510]
 
+let strings = numbers.map {
+    (number) -> String in
+    var number = number
+    var output = ""
+    repeat {
+        output = digitNames[number % 10]! + output      //字典下标表达式返回的是Optional类型
+        number /= 10
+    } while  number > 0
+    return output
+}
+print(strings)
+//字典下标返回一个可选值(optional value)， 表明该键不存在时会查找失败
+//通过尾随闭包语法，优雅地在函数后封装了闭包的具体功能，而不需要将整个闭包包裹在map(_:)方法的括号内
 
+//值捕获：闭包可以在其被定义的上下文中捕获常量或变量，即使定义这些常量和变量的原作用域已经不存在，闭包仍然可以在闭包函数体内引用和修改这些值
+func makeIncrementer(forIncrement amount: Int) -> () -> Int {
+    var runningTotal = 0
+    func incrementer() -> Int {
+        runningTotal += amount
+        return runningTotal
+    }
+    return incrementer
+}
 
+var incrementerByFour = makeIncrementer(forIncrement: 4)
+print(incrementerByFour())
+print(incrementerByFour())
 
+//会有另一个全新的、独立的runningTotal变量
+var incrementerByFive = makeIncrementer(forIncrement: 5)
+print(incrementerByFive())
+print(incrementerByFive())
 
+//increment()函数没有任何参数，但是在函数体内访问了runningTotal和amount变量，这是因为它从外围函数捕获了runningTotal和amount变量的引用；捕获引用保证了runningTotal和amount变量在调用完makeIncrementer后不会消失，并且保证了在下一次执行incrementer函数时，runningTotal依旧存在
 
+//为了优化，如果一个值不会被闭包改变，或者在闭包创建后不会改变，Swift可能会改为捕获并保存一份对值得拷贝；Swift也会负责被捕获变量的所有内存管理工作，包括释放不再需要的变量
 
+//如果你将闭包赋值给一个类实例的属性，并且该闭包通过访问该实例或其成员而捕获了该实例，你将在闭包和该实例之间创建一个循环强引用，Swift使用捕获列表来打破这种循环强引用
 
+//闭包是引用类型:函数和闭包都是引用类型
+//无论你将函数或闭包赋值给一个常量还是变量，你实际上都是将常量或变量的值设置为对应函数或闭包的引用
+//如果将闭包赋值给两个不同的常量或变量，两个值都会指向同一个闭包
+let alsoIncrementByFour = incrementerByFour
+print(alsoIncrementByFour())
 
+//逃逸闭包：当一个闭包作为参数传到一个函数中，但是这个闭包在函数返回之后才被执行，我们称该闭包从函数中逃逸。当定义接受闭包作为参数的函数时，可以在参数名之前标注@escaping，用来指明这个闭包是允许逃逸出这个函数的，否则这个闭包只能被调用或者被弃用
+
+//一种能够使闭包逃逸出函数的方法时，将这个闭包保存在一个函数外部定义的变量中。很多启动异步操作的函数接受一个闭包参数作为completion handler，这类函数在异步操作开始之后立刻返回，但是闭包直到异步操作结束后才会被调用
+var completionHandlers: [() -> Void] = []
+func someFunctionWithEscapingClosure(completionHandler: @escaping () -> Void) {
+    completionHandlers.append(completionHandler)
+}
+
+//将一个闭包标记为@escaping意味着你必须在闭包中显示地引用self
+func someFunctionWithNoescapingClosure(closure: () -> Void) {
+    closure()
+}
+
+class SomeClass {
+    
+}
 
 
 
