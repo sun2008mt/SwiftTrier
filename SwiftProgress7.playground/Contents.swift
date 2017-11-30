@@ -156,22 +156,76 @@ func someFunctionWithEscapingClosure(completionHandler: @escaping () -> Void) {
     completionHandlers.append(completionHandler)
 }
 
-//将一个闭包标记为@escaping意味着你必须在闭包中显示地引用self
 func someFunctionWithNoescapingClosure(closure: () -> Void) {
     closure()
 }
 
 class SomeClass {
-    
+    var x = 10
+    func doSomething() {
+        //将一个闭包标记为@escaping意味着你必须在闭包中显示地引用self
+        someFunctionWithEscapingClosure { self.x = 100 }
+        someFunctionWithNoescapingClosure { x = 200 }
+    }
 }
 
+let instance = SomeClass()
+instance.doSomething()
+//首先执行了没有逃逸闭包的函数
+print(instance.x)      //200
 
+//在函数执行完成之后执行逃逸闭包
+completionHandlers.first?()
+print(instance.x)      //100
 
+let test = [1,2,3,4,5]
+print(test.first!)
+print(test.last!)
+print(test.max()!)
+print(test.min()!)
 
+//自动闭包
+//自动闭包是一种自动创建的闭包，用于包装传递给函数作为参数的表达式,这种闭包不接受任何参数，当它被调用的时候，会返回被包装在其中的表达式的值。这种便利的语法让你能够省略闭包的花括号，用一个普通的表达式来代替显式的闭包
 
+//自动闭包让你能够延迟求值，因为直到你调用这个闭包，代码段才会被执行
 
+var customersInLine = ["Chris", "Alex", "Ewa", "Barry", "Daniella"]
+print(customersInLine.count)
 
+let customerProvider = { customersInLine.remove(at: 0) }    //() -> String类型
+print(customersInLine.count)
 
+//在调用闭包时才执行自动闭包里面的操作
+print("Now serving \(customerProvider())!")
+print(customersInLine.count)
+
+func serve(customer customerProvider: () -> String) {
+    print("Now serving \(customerProvider())!")
+}
+
+serve(customer: { customersInLine.remove(at: 0) })
+
+//@autoclosure表示接收一个自动闭包
+func serve(customer customerProvider: @autoclosure () -> String) {
+    print("Now serving \(customerProvider())!")
+}
+
+serve(customer: customersInLine.remove(at: 0))
+//过度使用@autoclosure会让代码变得难以理解，上下文和函数名应该能够清晰地表明求值是被延迟执行的
+
+//如果希望一个自动闭包可以逃逸，应该同时使用@autoclosure和@escaping属性
+var customerProviders: [() -> String] = []
+func collectCustomerProviders(_ customerProvider: @autoclosure @escaping () -> String) {
+    customerProviders.append(customerProvider)
+}
+collectCustomerProviders(customersInLine.remove(at: 0))
+print("Collected \(customerProviders.count) closures")
+collectCustomerProviders(customersInLine.remove(at: 0))
+print("Collected \(customerProviders.count) closures")
+
+for customerProvider in customerProviders {
+    print("Now serving \(customerProvider())!")
+}
 
 
 
