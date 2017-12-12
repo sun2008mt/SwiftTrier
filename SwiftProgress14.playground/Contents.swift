@@ -252,18 +252,63 @@ for item in breakfastList {
     print(item.description)
 }
 
-//可失败构造器
+//可失败构造器：如果一个类、结构体或枚举类型的对象，在构造过程中有可能失败，则为其定义一个可失败构造器。“失败”是指，如给构造器传入无效的参数值，或缺少某种所需的外部资源，又或是不满足某种必要的条件等
+//可失败构造器语法：init?
+//可失败构造器的参数名和参数类型，不能与其非可失败构造器的参数名及参数类型相同
 
+//可失败构造器会创建一个类型为自身类型的可选类型的对象，通过return nil语句来表明可失败构造器在何种情况下应该“失败”
 
+//严格来说，构造器都不支持返回值，因为构造器本身的作用只是为了确保对象能被正确构造。因此你只是用return nil表明可失败构造器构造失败，而不要用关键字return来表明构造成功
 
+struct Animal {
+    let species: String
+    init?(species: String) {
+        if species.isEmpty {return nil}
+        self.species = species
+    }
+}
 
+let someCreature = Animal(species: "Giraffe")   //someCreature的类型是Animal?而不是Animal
 
+if let giraffe = someCreature {
+    print("An animal was initialized with a species of \(giraffe.species)")
+}
 
+let anonymousCreature = Animal(species: "")
+print(anonymousCreature == nil)
 
+//""空字符串是一个有效的，非可选类型的字符串
 
+//枚举类型的可失败构造器
+enum TemperatureUnit {
+    case Kelvin, Celsius, Fahrenheit
+    init?(symbol: Character) {
+        switch symbol {
+        case "K":
+            self = .Kelvin
+        case "C":
+            self = .Celsius
+        case "F":
+            self = .Fahrenheit
+        default:
+            return nil
+        }
+    }
+}
 
+let fahrenheitUnit = TemperatureUnit(symbol: "F")
+let unknownUnit = TemperatureUnit(symbol: "X")
 
+//带原始值的枚举类型的可失败构造器
+//带原始值的枚举类型会自带一个可失败构造器init?(rawValue)
 
+enum TemperatureUnit2: Character {
+    case Kelvin = "K", Celsius = "C", Fahrenhei = "F"
+}
+let fahenheitUnit2 = TemperatureUnit2(rawValue: "F")    //和原始值匹配
+
+//构造失败的传递：子类的可失败构造器也能向上代理到父类的可失败构造器
+//可失败构造器也可以代理到其他的非可失败构造器，通过这种方式，你可以增加一个可能的失败状态到现有的构造过程中
 
 
 
